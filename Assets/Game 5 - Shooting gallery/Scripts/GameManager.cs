@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using System.Collections.Generic;
 using System;
 
 public class GameManager : MonoBehaviour
@@ -12,14 +13,15 @@ public class GameManager : MonoBehaviour
     public string playerTurn;
     public string[] tags = new string[9];
     public int openBoxcount = 9;
-    public TextMesh[] boxLetter = new TextMesh[9]; 
+    public TextMesh[] boxLetter = new TextMesh[9];
+    public TextMesh[] currentLayout = new TextMesh[9];
     private int optimizer;
     private bool successfulMove = false;
     public bool gameOver = false;
     public GameObject Reset_button;
     public TextMesh winner;
-    private bool firstmove = true;
-    
+    public bool firstmove = true;
+    Dictionary<TextMesh[], int> lookup = new Dictionary<TextMesh[], int>();
 
     void Awake()
     {
@@ -29,7 +31,7 @@ public class GameManager : MonoBehaviour
             gm2 = this;
         }
         //do not destroy when reloading scene
-        DontDestroyOnLoad(transform.gameObject);     
+        DontDestroyOnLoad(transform.gameObject);
     }
 
 
@@ -67,6 +69,10 @@ public class GameManager : MonoBehaviour
         Box[8] = GameObject.Find("Box9");
         boxLetter[8] = GameObject.Find("boxLetter9").GetComponent<TextMesh>();
 
+        currentLayout = boxLetter;
+        lookup.Add(boxLetter, 4); //adds the empty game state to the dictionary 
+
+        
 
 
         for (int i = 0; i < tags.Length; i++)//make all boxes available
@@ -88,10 +94,11 @@ public class GameManager : MonoBehaviour
             number = rnd.Next(0, 9);
             optimizer = checkforoptimalplay(number); //used to make computer check for gamewinning placement
             if (tags[optimizer] == "canchange")
-                number = optimizer; 
+                number = optimizer;
+            
             if (firstmove == true)
             {
-                number = 4;
+                lookup.TryGetValue(currentLayout, out number); //prioritizes the middle square for its first move
                 firstmove = false;
             }
 
@@ -180,6 +187,7 @@ public class GameManager : MonoBehaviour
 
     private int checkforoptimalplay(int anumber) //used to help computer make move that would lead to a victory condition
     {
+
         if (boxLetter[0].text == playerTurn && boxLetter[1].text == playerTurn)
             return 2;
         else if (boxLetter[3].text == playerTurn && boxLetter[4].text == playerTurn)
@@ -232,7 +240,7 @@ public class GameManager : MonoBehaviour
             return 2;
         else if (boxLetter[2].text == playerTurn && boxLetter[4].text == playerTurn)
             return 6;
-		else if (boxLetter[0].text == "X" && boxLetter[1].text == "X")
+        else if (boxLetter[0].text == "X" && boxLetter[1].text == "X")
             return 2;
         else if (boxLetter[3].text == "X" && boxLetter[4].text == "X")
             return 5;

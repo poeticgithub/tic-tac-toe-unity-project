@@ -8,7 +8,6 @@ public class reset_script : MonoBehaviour {
     void OnMouseDown()
 
     {
-        GameObject current = GameManager.gm2.Reset_button;
 
         for (int i = 0; i < GameManager.gm2.tags.Length; i++)//make all boxes available
         {
@@ -18,7 +17,7 @@ public class reset_script : MonoBehaviour {
             GameManager.gm2.winner.text = " ";
             GameManager.gm2.gameOver = false;
             GameManager.gm2.tags[i] = "canchange";
-
+            GameManager.gm2.firstmove = true;
         }
 
     }
